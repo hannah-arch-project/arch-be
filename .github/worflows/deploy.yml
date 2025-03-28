@@ -1,0 +1,42 @@
+name: Backend Deploy to EC2 via CodeDeploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Zip source code
+        run: zip -r app.zip . -x \"*.git*\" -x \"node_modules/*\"
+
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --exact-timestamps
+        env:
+          AWS_S3_BUCKET: # S3 bucket name
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: "."
+          DEST_DIR: "backend"
+
+      - name: Trigger CodeDeploy
+        uses: webfactory/create-aws-codedeploy-deployment@v0.2.0
+        with:
+          application-name: "backend_app"
+          deployment-group: "backend_app_deploy_group"
+          bucket: # S3 bucket name
+          bundle-key: "backend/backend.zip"
+          deployment-description: "GitHub Actions 배포"
+          wait-until-complete: true
+        env:
+          AWS_REGION: ap-northeast-2
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
