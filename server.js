@@ -19,7 +19,9 @@ const pool = mysql.createPool({
 });
 
 app.use(cors({
-  origin: 'https://www.shndh.kro.kr'
+  origin: 'https://www.shndh.kro.kr',
+  methods: ['GET', 'POST', 'DELETE'],
+  credentials: true
 }));
 app.use(express.json());
 
