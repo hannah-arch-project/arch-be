@@ -18,7 +18,9 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://www.shndh.kro.kr'
+}));
 app.use(express.json());
 
 // ✅ 서버 시작 시 테이블 자동 생성
