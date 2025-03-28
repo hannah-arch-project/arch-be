@@ -21,7 +21,7 @@ jobs:
         with:
           args: --exact-timestamps
         env:
-          AWS_S3_BUCKET: # S3 bucket name
+          AWS_S3_BUCKET: "hannah-backend-bucket"
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: "."
@@ -32,7 +32,7 @@ jobs:
         with:
           application-name: "backend_app"
           deployment-group: "backend_app_deploy_group"
-          bucket: # S3 bucket name
+          bucket: "hannah-backend-bucket"
           bundle-key: "backend/backend.zip"
           deployment-description: "GitHub Actions 배포"
           wait-until-complete: true
