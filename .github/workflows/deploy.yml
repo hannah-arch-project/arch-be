@@ -15,7 +15,7 @@ jobs:
 
       - name: Zip source code
         run: |
-          zip -r app.zip . -x ".git/*" ".github/*" "node_modules/*"
+          zip -r backend.zip . -x ".git/*" ".github/*" "node_modules/*"
 
       - name: Upload to S3
         uses: jakejarvis/s3-sync-action@master
@@ -29,15 +29,14 @@ jobs:
           DEST_DIR: "backend"
 
       - name: Trigger CodeDeploy
-        uses: webfactory/create-aws-codedeploy-deployment@v0.2.0
-        with:
-          application-name: "backend_app"
-          deployment-group: "backend_app_deploy_group"
-          bucket: "hannah-backend-bucket"
-          bundle-key: "backend/backend.zip"
-          deployment-description: "GitHub Actions 배포"
-          wait-until-complete: true
+        run: |
+          aws deploy create-deployment \
+            --application-name backend_app \
+            --deployment-group-name backend_app_deploy_group \
+            --s3-location bucket=hannah-backend-bucket,key=backend/backend.zip,bundleType=zip \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --description "GitHub Actions 배포"
         env:
-          AWS_REGION: ap-northeast-2
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-northeast-2
